@@ -1,0 +1,8 @@
+---
+- hosts: terraform1
+  become: yes
+  vars:
+    server_privkey: kOu4oJCyRtkQMELG4P8jNv4bxBOBKdR6U2OhqH6FEn0=
+    server_pubkey: dcPmmFW6llQz+bgTE8stV/bjYqMGeYWZlxp7AUr1Kyw=
+  roles:
+    - terraform1

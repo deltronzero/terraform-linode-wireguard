@@ -1,0 +1,66 @@
+---
+
+- name: generate keys
+  ansible.builtin.command: scripts/make_variables.sh
+  become: false
+  delegate_to: 127.0.0.1
+
+- name: Make python3 default
+  alternatives:
+    name: python
+    path: /usr/bin/python3
+    link: /usr/bin/python
+    priority: 10
+
+- name: update apt packages
+  apt:
+    update_cache: yes
+    upgrade: dist
+
+  # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/apt_module.html
+- name: install wireguard package
+  apt:
+    name: wireguard
+    state: present
+    update_cache: yes
+
+  # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/copy_module.html
+- name: create server wireguard config
+  template:
+    dest: /etc/wireguard/wg0.conf
+    src: server_wg0.conf.j2
+    owner: root
+    group: root
+    mode: '0600'
+
+  # https://docs.ansible.com/ansible/latest/collections/ansible/posix/sysctl_module.html
+- name: enable and persist ip forwarding
+  sysctl:
+    name: net.ipv4.ip_forward
+    value: "1"
+    state: present
+    sysctl_set: yes
+    reload: yes
+
+  # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/systemd_module.html
+- name: start wireguard and enable on boot
+  systemd:
+    name: wg-quick@wg0
+    enabled: yes
+    state: restarted
+
+# - name: get content of local file
+#   set_fact:
+#     readme_contents: "{{ lookup('file','templates/client_wg0.conf.j2') }}"
+
+
+# - name: "Print the file content to a console"
+#   debug:
+#     msg: "{{ readme_contents }}"
+
+- name: create server wireguard config
+  template:
+    dest: wg0.conf
+    src: client_wg0.conf.j2
+  delegate_to: 127.0.0.1
+  become: false
