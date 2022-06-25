@@ -1,6 +1,5 @@
 ---
-
-- name: generate keys
+- name: generate server and client keys
   ansible.builtin.command: scripts/make_variables.sh
   become: false
   delegate_to: 127.0.0.1
@@ -31,7 +30,7 @@
     src: server_wg0.conf.j2
     owner: root
     group: root
-    mode: '0600'
+    mode: "0600"
 
   # https://docs.ansible.com/ansible/latest/collections/ansible/posix/sysctl_module.html
 - name: enable and persist ip forwarding
@@ -43,22 +42,13 @@
     reload: yes
 
   # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/systemd_module.html
-- name: start wireguard and enable on boot
+- name: (re)start wireguard and enable on boot
   systemd:
     name: wg-quick@wg0
     enabled: yes
     state: restarted
 
-# - name: get content of local file
-#   set_fact:
-#     readme_contents: "{{ lookup('file','templates/client_wg0.conf.j2') }}"
-
-
-# - name: "Print the file content to a console"
-#   debug:
-#     msg: "{{ readme_contents }}"
-
-- name: create server wireguard config
+- name: create local wireguard config
   template:
     dest: wg0.conf
     src: client_wg0.conf.j2
