@@ -17,6 +17,12 @@
     upgrade: dist
 
   # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/apt_module.html
+- name: install iptables package
+  apt:
+    name: iptables
+    state: present
+    update_cache: yes
+
 - name: install wireguard package
   apt:
     name: wireguard

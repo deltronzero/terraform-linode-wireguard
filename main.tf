@@ -15,7 +15,7 @@ resource "random_pet" "server" {
 }
 
 resource "linode_instance" "terraform1" {
-  image           = "linode/ubuntu20.04"
+  image           = "linode/kali"
   label           = "terraform-${random_pet.server.id}"
   group           = "Terraform"
   region          = "us-west"
